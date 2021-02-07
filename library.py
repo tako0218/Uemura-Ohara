@@ -1,11 +1,28 @@
 import sys
 import math
 import itertools
-from functools import reduce
-from collections import defaultdict
+import numpy as numpy
+import scipy.sparse.csgraph as ssc
+from fractions import gcd
+from functools import reduce, lru_cache
+from collections import defaultdict, deque, Counter
+from heapq import heappop,heappush
+from bisect import bisect_left, bisect_right
 #累乗はpow()
-mod = 10 ** 9 + 7
 
+'''
+itertools.product(l,m)はlとmの直積を返す
+
+l = ['a', 'b', 'b', 'b', 'd', 'd']
+print(l.count('b'))  # -> 3
+c = Counter(l)
+print(c)  # -> Counter({'b': 3, 'd': 2, 'a': 1})
+# カウントが大きい順に全ての要素を返す
+print(c.most_common())  # -> [('b', 3), ('d', 2), ('a', 1)]
+
+@lru_cache(maxsize=None)
+'''
+mod = 10 ** 9 + 7
 
 #逆元を用いた高速nCr
 U = 2*10**5
@@ -29,7 +46,7 @@ def nCr(n,k,mod):
     x *= fact_inv[n-k]
     x %= MOD
     return x
-    
+
 def nHr(n,a,mod):
     return nCr(n-1+a,n-1,mod)
 
@@ -202,3 +219,6 @@ def make_Hadamard_matrix(n,k,x):
             else:
                 next[i][j] = x[i%(2**k)][j%(2**k)]
     return make_Hadamard_matrix(n,k+1,next)
+
+def lcm(a,b):
+    return a * b // gcd(a,b)
