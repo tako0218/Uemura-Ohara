@@ -1,5 +1,7 @@
-from functools import reduce
+import sys
+import math
 import itertools
+from functools import reduce
 from collections import defaultdict
 
 mod = 10 ** 9 + 7
@@ -108,3 +110,51 @@ def diff(x, y):
 n = int(input())
 par = [-1] * n
 '''
+
+class BinaryIndexedTree():
+    def __init__(self, seq):
+        self.size = len(seq)
+        self.depth = self.size.bit_length()
+        self.build(seq)
+
+    def build(self, seq):
+        data = seq
+        size = self.size
+        for i, x in enumerate(data):
+            j = i + (i & (-i))
+            if j < size:
+                data[j] += data[i]
+        self.data = data
+
+    def __repr__(self):
+        return self.data.__repr__()
+
+    def get_sum(self, i):
+        data = self.data
+        s = 0
+        while i:
+            s += data[i]
+            i -= i & -i
+        return s
+
+    def add(self, i, x):
+        data = self.data
+        size = self.size
+        while i < size:
+            data[i] += x
+            i += i & -i
+
+    def find_kth_element(self, k):
+        data = self.data
+        size = self.size
+        x, sx = 0, 0
+        dx = 1 << (self.depth)
+        for i in range(self.depth - 1, -1, -1):
+            dx = (1 << i)
+            if x + dx >= size:
+                continue
+            y = x + dx
+            sy = sx + data[y]
+            if sy < k:
+                x, sx = y, sy
+        return x + 1
