@@ -1,24 +1,43 @@
 import sys
 import math
-import itertools
 import numpy as numpy
 import scipy.sparse.csgraph as ssc
+from copy import deepcopy
 from fractions import gcd
+from itertools import product, accumulate, permutations, combinations
 from functools import reduce, lru_cache
 from collections import defaultdict, deque, Counter
 from heapq import heappop,heappush
 from bisect import bisect_left, bisect_right
+
+sys.setrecursionlimit(10 ** 7)
+
 #累乗はpow()
 
 '''
-itertools.product(l,m)はlとmの直積を返す
+l = [0,1,2,3]
+q = deque(l)
+q.append(4) # 後ろから4を挿入, l=deque([0,1,2,3,4])
+q.appendleft(5)#前から5を挿入, l=deque([5,0,1,2,3,4])
+x = q.pop() #後ろの要素を取り出す, x=4, l=deque([5,0,1,2,3])
+y = q.popleft() # 前の要素を取り出す, y=5, l = deque([0,1,2,3])
 
-l = ['a', 'b', 'b', 'b', 'd', 'd']
-print(l.count('b'))  # -> 3
-c = Counter(l)
-print(c)  # -> Counter({'b': 3, 'd': 2, 'a': 1})
-# カウントが大きい順に全ての要素を返す
-print(c.most_common())  # -> [('b', 3), ('d', 2), ('a', 1)]
+product(l,m)はlとmの直積を返す
+
+A=[1,2,3,4]
+for i in permutations(A,2):
+    print(i,end=' ')
+#(1, 2) (1, 3) (1, 4) (2, 1) (2, 3) (2, 4) (3, 1) (3, 2) (3, 4) (4, 1) (4, 2) (4, 3) 
+for i in combinations(A,2):
+    print(i, end=' ')
+#(1, 2) (1, 3) (1, 4) (2, 3) (2, 4) (3, 4) 
+
+l=['a','b','b','c','b','a','c','c','b','c','b','a']
+S=Counter(l)#カウンタークラスが作られる。S=Counter({'b': 5, 'c': 4, 'a': 3})
+print(S.most_common(2)) #[('b', 5), ('c', 4)]
+print(S.keys()) #dict_keys(['a', 'b', 'c'])
+print(S.values()) #dict_values([3, 5, 4])
+print(S.items()) #dict_items([('a', 3), ('b', 5), ('c', 4)])
 
 @lru_cache(maxsize=None)
 '''
@@ -31,20 +50,20 @@ fact = [1]*(U+1)
 fact_inv = [1]*(U+1)
 
 for i in range(1,U+1):
-    fact[i] = (fact[i-1]*i)%MOD
-fact_inv[U] = pow(fact[U],MOD-2,MOD)
+    fact[i] = (fact[i-1]*i)%mod
+fact_inv[U] = pow(fact[U],mod-2,mod)
 
 for i in range(U,0,-1):
-    fact_inv[i-1] = (fact_inv[i]*i)%MOD
+    fact_inv[i-1] = (fact_inv[i]*i)%mod
 
 def nCr(n,k,mod):
     if k < 0 or k > n:
         return 0
     x = fact[n]
     x *= fact_inv[k]
-    x %= MOD
+    x %= mod
     x *= fact_inv[n-k]
-    x %= MOD
+    x %= mod
     return x
 
 def nHr(n,a,mod):
