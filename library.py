@@ -3,13 +3,44 @@ import math
 import itertools
 from functools import reduce
 from collections import defaultdict
-
+#累乗はpow()
 mod = 10 ** 9 + 7
-  # 累乗はpow()
-def nCr(N,a):
-    num = reduce(lambda x,y:x * y % mod,range(N,N-a,-1))
-    den = reduce(lambda x,y:x * y % mod,range(1,a+1))
-    return num * pow(den,mod-2,mod)%mod
+
+
+#逆元を用いた高速nCr
+U = 2*10**5
+
+fact = [1]*(U+1)
+fact_inv = [1]*(U+1)
+
+for i in range(1,U+1):
+    fact[i] = (fact[i-1]*i)%MOD
+fact_inv[U] = pow(fact[U],MOD-2,MOD)
+
+for i in range(U,0,-1):
+    fact_inv[i-1] = (fact_inv[i]*i)%MOD
+
+def nCr(n,k,mod):
+    if k < 0 or k > n:
+        return 0
+    x = fact[n]
+    x *= fact_inv[k]
+    x %= MOD
+    x *= fact_inv[n-k]
+    x %= MOD
+    return x
+    
+def nHr(n,a,mod):
+    return nCr(n-1+a,n-1,mod)
+
+#10進数をn進数に変える
+def From10_to_n(x,n):
+    tmp = x
+    to_n = ""
+    while tmp > 0:
+        to_n = str(tmp%n)+to_n
+        tmp = int(tmp/n)
+    return to_n
 
 # Union Find-----------------------------------------
 
@@ -158,3 +189,16 @@ class BinaryIndexedTree():
             if sy < k:
                 x, sx = y, sy
         return x + 1
+
+#(n,0,[[1]])を与えると、n×nの各ベクトルが互いに直交する行列を生成
+def make_Hadamard_matrix(n,k,x):
+    if n == k:
+        return x
+    next = [[0] * (2 ** (k+1)) for i in range(2 ** (k+1))]
+    for i in range(2 ** (k+1)):
+        for j in range(2 ** (k+1)):
+            if i >= 2 ** k and j >= 2 ** k:
+                next[i][j] = -x[i%(2**k)][j%(2**k)]
+            else:
+                next[i][j] = x[i%(2**k)][j%(2**k)]
+    return make_Hadamard_matrix(n,k+1,next)
